@@ -1,49 +1,8 @@
 // State
 let products = [];
-
-fetch("/produtos.json")
-  .then(res => res.json())
-  .then(data => {
-    products = data;
-    renderAllProducts();
-  });
-  
 let cart = JSON.parse(localStorage.getItem('patyModasCart')) || [];
 let isAdmin = false;
-
-// Seed initial data if empty
-if (products.length === 0) {
-    products = [
-        {
-            id: '1',
-            category: 'novidades',
-            name: 'Vestido Floral Primavera',
-            description: 'Vestido leve e delicado para a estação.',
-            internalId: 'V001',
-            price: '129.90',
-            image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: '2',
-            category: 'blusas',
-            name: 'Blusa de Seda Rosa',
-            description: 'Elegância e conforto em uma peça única.',
-            internalId: 'B001',
-            price: '89.90',
-            image: 'https://images.unsplash.com/photo-1604176354204-9268737828fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: '3',
-            category: 'bolsas',
-            name: 'Bolsa de Couro Preta',
-            description: 'Perfeita para todas as ocasiões.',
-            internalId: 'A001',
-            price: '199.90',
-            image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        }
-    ];
-    localStorage.setItem('patyModasProducts', JSON.stringify(products));
-}
+const API_URL = 'http://localhost:3000/api/products';
 
 // DOM Elements
 const loginBtn = document.getElementById('login-btn');
@@ -64,10 +23,68 @@ const checkoutBtn = document.getElementById('checkout-btn');
 
 // Initial Render
 document.addEventListener('DOMContentLoaded', () => {
-    renderAllProducts();
+    fetchProducts();
     checkLoginState();
     updateCartUI();
 });
+
+// --- API Integration ---
+
+async function fetchProducts() {
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Erro ao buscar produtos');
+        products = await response.json();
+        renderAllProducts();
+    } catch (error) {
+        console.error('Erro:', error);
+        // Fallback if server is offline, maybe show empty or cached?
+        // For now, just log error.
+    }
+}
+
+async function saveProductAPI(product) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        });
+        if (!response.ok) throw new Error('Erro ao salvar produto');
+        await fetchProducts(); // Refresh list
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao salvar produto no servidor. Verifique se o servidor está rodando.');
+    }
+}
+
+async function updateProductAPI(product) {
+    try {
+        const response = await fetch(`${API_URL}/${product.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        });
+        if (!response.ok) throw new Error('Erro ao atualizar produto');
+        await fetchProducts(); // Refresh list
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao atualizar produto no servidor.');
+    }
+}
+
+async function deleteProductAPI(id) {
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Erro ao excluir produto');
+        await fetchProducts(); // Refresh list
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao excluir produto no servidor.');
+    }
+}
 
 // --- Login Logic ---
 loginBtn.addEventListener('click', () => {
@@ -297,9 +314,7 @@ window.editProduct = function(id) {
 
 window.deleteProduct = function(id) {
     if (confirm('Tem certeza que deseja excluir este produto?')) {
-        products = products.filter(p => p.id !== id);
-        saveProducts();
-        renderAllProducts();
+        deleteProductAPI(id);
     }
 };
 
@@ -310,7 +325,7 @@ productForm.addEventListener('submit', (e) => {
     const isEdit = !!id;
 
     const productData = {
-        id: isEdit ? id : Date.now().toString(), // Simple ID generation
+        id: isEdit ? id : Date.now().toString(),
         category: document.getElementById('product-category').value,
         name: document.getElementById('p-name').value,
         description: document.getElementById('p-desc').value,
@@ -320,22 +335,13 @@ productForm.addEventListener('submit', (e) => {
     };
 
     if (isEdit) {
-        const index = products.findIndex(p => p.id === id);
-        if (index !== -1) {
-            products[index] = productData;
-        }
+        updateProductAPI(productData);
     } else {
-        products.push(productData);
+        saveProductAPI(productData);
     }
 
-    saveProducts();
-    renderAllProducts();
     closeProductModal();
 });
-
-function saveProducts() {
-    localStorage.setItem('patyModasProducts', JSON.stringify(products));
-}
 
 // Close modals when clicking outside
 window.onclick = function(event) {
