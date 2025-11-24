@@ -1,5 +1,13 @@
 // State
-let products = JSON.parse(localStorage.getItem('patyModasProducts')) || [];
+let products = [];
+
+fetch("/produtos.json")
+  .then(res => res.json())
+  .then(data => {
+    products = data;
+    renderAllProducts();
+  });
+  
 let cart = JSON.parse(localStorage.getItem('patyModasCart')) || [];
 let isAdmin = false;
 
