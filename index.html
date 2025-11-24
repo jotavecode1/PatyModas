@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paty Modas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <h1 class="brand-name">PATY MODAS</h1>
+        </div>
+        <div class="header-bottom">
+            <nav>
+                <ul>
+                    <li><a href="#novidades">Novidades</a></li>
+                    <li><a href="#vestidos">Vestidos</a></li>
+                    <li><a href="#calcas">Calças</a></li>
+                    <li><a href="#shorts">Shorts</a></li>
+                    <li><a href="#blusas">Blusas</a></li>
+                    <li><a href="#jaquetas">Jaquetas</a></li>
+                    <li><a href="#bolsas">Bolsas</a></li>
+                </ul>
+            </nav>
+            <button id="login-btn" class="btn-login">Entrar</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sections will be populated by JS, but structure is here for reference -->
+        <section id="novidades" class="category-section">
+            <div class="section-header">
+                <h2>Novidades</h2>
+                <button class="btn-add-product admin-only" onclick="openAddModal('novidades')"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+            <div class="product-grid" id="grid-novidades">
+                <!-- Products go here -->
+            </div>
+        </section>
+
+        <section id="vestidos" class="category-section">
+            <div class="section-header">
+                <h2>Vestidos</h2>
+                <button class="btn-add-product admin-only" onclick="openAddModal('vestidos')"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+            <div class="product-grid" id="grid-vestidos"></div>
+        </section>
+
+        <section id="calcas" class="category-section">
+            <div class="section-header">
+                <h2>Calças</h2>
+                <button class="btn-add-product admin-only" onclick="openAddModal('calcas')"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+            <div class="product-grid" id="grid-calcas"></div>
+        </section>
+
+        <section id="shorts" class="category-section">
+            <div class="section-header">
+                <h2>Shorts</h2>
+                <button class="btn-add-product admin-only" onclick="openAddModal('shorts')"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+            <div class="product-grid" id="grid-shorts"></div>
+        </section>
+
+        <section id="blusas" class="category-section">
+            <div class="section-header">
+                <h2>Blusas</h2>
+                <button class="btn-add-product admin-only" onclick="openAddModal('blusas')"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+            <div class="product-grid" id="grid-blusas"></div>
+        </section>
+
+        <section id="jaquetas" class="category-section">
+            <div class="section-header">
+                <h2>Jaquetas</h2>
+                <button class="btn-add-product admin-only" onclick="openAddModal('jaquetas')"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+            <div class="product-grid" id="grid-jaquetas"></div>
+        </section>
+
+        <section id="bolsas" class="category-section">
+            <div class="section-header">
+                <h2>Bolsas</h2>
+                <button class="btn-add-product admin-only" onclick="openAddModal('bolsas')"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+            <div class="product-grid" id="grid-bolsas"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Paty Modas. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Área do Funcionário</h3>
+            <input type="password" id="password-input" placeholder="Senha">
+            <button id="confirm-login-btn">Entrar</button>
+        </div>
+    </div>
+
+    <!-- Product Form Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <h3 id="modal-title">Adicionar Produto</h3>
+            <form id="product-form">
+                <input type="hidden" id="product-category">
+                <input type="hidden" id="product-id"> <!-- For editing -->
+                
+                <div class="form-group">
+                    <label>Nome do Produto</label>
+                    <input type="text" id="p-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Descrição (Opcional)</label>
+                    <textarea id="p-desc"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>ID Interno (Visível apenas para funcionários)</label>
+                    <input type="text" id="p-internal-id" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Preço (R$)</label>
+                    <input type="number" id="p-price" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label>URL da Imagem</label>
+                    <input type="url" id="p-image" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
