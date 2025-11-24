@@ -1,5 +1,6 @@
 // State
 let products = JSON.parse(localStorage.getItem('patyModasProducts')) || [];
+let cart = JSON.parse(localStorage.getItem('patyModasCart')) || [];
 let isAdmin = false;
 
 // Seed initial data if empty
@@ -45,10 +46,19 @@ const passwordInput = document.getElementById('password-input');
 const productModal = document.getElementById('product-modal');
 const productForm = document.getElementById('product-form');
 
+// Cart Elements
+const cartBtn = document.getElementById('cart-btn');
+const cartModal = document.getElementById('cart-modal');
+const cartItemsContainer = document.getElementById('cart-items');
+const cartTotalPrice = document.getElementById('cart-total-price');
+const cartCount = document.getElementById('cart-count');
+const checkoutBtn = document.getElementById('checkout-btn');
+
 // Initial Render
 document.addEventListener('DOMContentLoaded', () => {
     renderAllProducts();
     checkLoginState();
+    updateCartUI();
 });
 
 // --- Login Logic ---
@@ -90,8 +100,7 @@ function logout() {
 }
 
 function checkLoginState() {
-    // Optional: Persist login session if needed, but for now it resets on refresh as per simple requirements
-    // If we wanted persistence, we'd check sessionStorage here.
+    // Optional: Persist login session if needed
 }
 
 // --- Product Management ---
@@ -127,6 +136,7 @@ function createProductCard(product) {
             <h3 class="product-name">${product.name}</h3>
             ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
             <p class="product-price">${priceFormatted}</p>
+            <button class="btn-add-cart" onclick="addToCart('${product.id}')">Adicionar ao Carrinho</button>
         </div>
         <div class="admin-info admin-only" style="display: none;">
             <span>ID: ${product.internalId}</span>
@@ -138,6 +148,113 @@ function createProductCard(product) {
     `;
     return div;
 }
+
+// --- Cart Logic ---
+
+cartBtn.addEventListener('click', () => {
+    renderCart();
+    cartModal.style.display = 'flex';
+});
+
+window.closeCartModal = function() {
+    cartModal.style.display = 'none';
+};
+
+window.addToCart = function(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+
+    const existingItem = cart.find(item => item.id === productId);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
+    
+    saveCart();
+    updateCartUI();
+    alert('Produto adicionado ao carrinho!');
+};
+
+window.removeFromCart = function(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    saveCart();
+    renderCart();
+    updateCartUI();
+};
+
+window.updateQuantity = function(productId, change) {
+    const item = cart.find(item => item.id === productId);
+    if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+            removeFromCart(productId);
+        } else {
+            saveCart();
+            renderCart();
+            updateCartUI();
+        }
+    }
+};
+
+function saveCart() {
+    localStorage.setItem('patyModasCart', JSON.stringify(cart));
+}
+
+function updateCartUI() {
+    const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalCount;
+}
+
+function renderCart() {
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
+
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p>Seu carrinho está vazio.</p>';
+    } else {
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            
+            const div = document.createElement('div');
+            div.className = 'cart-item';
+            div.innerHTML = `
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.name}</div>
+                    <div class="cart-item-price">R$ ${parseFloat(item.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} x ${item.quantity}</div>
+                </div>
+                <div class="cart-item-controls">
+                    <button class="btn-qty" onclick="updateQuantity('${item.id}', -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button class="btn-qty" onclick="updateQuantity('${item.id}', 1)">+</button>
+                    <button class="btn-remove" onclick="removeFromCart('${item.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            cartItemsContainer.appendChild(div);
+        });
+    }
+
+    cartTotalPrice.textContent = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+checkoutBtn.addEventListener('click', () => {
+    if (cart.length === 0) return;
+
+    let message = "Olá! Gostaria de finalizar meu pedido na Paty Modas:\n\n";
+    let total = 0;
+
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        message += `*${item.quantity}x ${item.name}* - R$ ${itemTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
+    });
+
+    message += `\n*Total: ${total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}*`;
+
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+});
 
 // --- Add/Edit Logic ---
 
@@ -219,5 +336,8 @@ window.onclick = function(event) {
     }
     if (event.target == productModal) {
         productModal.style.display = "none";
+    }
+    if (event.target == cartModal) {
+        cartModal.style.display = "none";
     }
 }

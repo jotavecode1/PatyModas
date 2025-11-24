@@ -320,6 +320,132 @@ body.is-admin .product-card .admin-only {
     display: flex !important; /* For flex containers like admin-info */
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-cart {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    position: relative;
+    color: var(--dark-text);
+}
+
+#cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--secondary-pink);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* Cart Modal Styles */
+.cart-content {
+    max-width: 600px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-title {
+    font-weight: bold;
+    font-family: var(--font-heading);
+}
+
+.cart-item-price {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-qty {
+    background: #eee;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.btn-remove {
+    background: none;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+}
+
+.cart-footer {
+    margin-top: 2rem;
+    border-top: 2px solid var(--primary-pink);
+    padding-top: 1rem;
+}
+
+.cart-total {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: right;
+    margin-bottom: 1rem;
+}
+
+.btn-whatsapp {
+    width: 100%;
+    padding: 1rem;
+    background-color: #25D366;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128C7E;
+}
+
+.btn-add-cart {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: var(--dark-text);
+    color: white;
+    border: none;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-add-cart:hover {
+    background-color: #555;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .header-bottom {
@@ -334,7 +460,7 @@ body.is-admin .product-card .admin-only {
         gap: 0.8rem;
     }
     
-    .btn-login {
+    .header-actions {
         margin-top: 0.5rem;
     }
 
